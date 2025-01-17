@@ -32,9 +32,12 @@
       pointer-events: none; /* Allow interactions through canvas */
       background: black;
     }
+    /* Subtle Matrix characters style */
+    .matrix-char {
+      font-family: monospace;
+      color: rgba(153, 69, 255, 0.2); /* semi-transparent purple */
+    }
     /* Rest of your existing styles... */
-    /* (Include your styles from the previous HTML here) */
-    /* Example snippet: */
     #terminal {
       width: 80%;
       max-width: 800px;
@@ -43,8 +46,10 @@
       border: 1px solid #333;
       box-shadow: 0 0 10px rgba(153, 69, 255, 0.5);
       margin: 20px auto;
+      position: relative;
+      z-index: 2;
     }
-    /* ... Rest of your styles ... */
+    /* ... include other styles as needed ... */
   </style>
 </head>
 <body>
@@ -62,7 +67,7 @@
       </p>
     </div>
     <button id="open-scenario-modal">Run Scenario Simulation</button>
-    <!-- ... The rest of your HTML content (modal, scripts) ... -->
+    <!-- The rest of your HTML content (modal, etc.) -->
   </div>
 
   <script>
@@ -74,22 +79,24 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const columns = canvas.width / 20; // number of columns for characters
-    const drops = Array(Math.floor(columns)).fill(1); // initial y position for each column
-
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%'; // characters for animation
+    const fontSize = 20;
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops = Array(columns).fill(1);
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()'; // characters for animation
 
     function drawMatrix() {
+      // Slightly fade the canvas to avoid sharp trails
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = '#0F0'; // green characters
-      ctx.font = '20px monospace';
+      // Set text style: subtle purple
+      ctx.fillStyle = 'rgba(153, 69, 255, 0.2)';
+      ctx.font = `${fontSize}px monospace`;
 
       for (let i = 0; i < drops.length; i++) {
         const text = characters.charAt(Math.floor(Math.random() * characters.length));
-        const x = i * 20;
-        const y = drops[i] * 20;
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
         ctx.fillText(text, x, y);
 
         // Reset drop randomly after it reaches the bottom
@@ -108,7 +115,7 @@
       canvas.height = window.innerHeight;
     });
 
-    // Rest of your JavaScript simulation code...
+    // Simulation script (existing code)
     const openScenarioModal = document.getElementById('open-scenario-modal');
     const closeScenarioModal = document.getElementById('close-scenario-modal');
     const scenarioModal = document.getElementById('scenario-modal');
@@ -160,7 +167,6 @@
         let direction = changePercent >= 0 ? '↑' : '↓';
         let targetPrice = 'N/A';
 
-        // Apply specific logic for BTC based on predictionText
         if (coin === 'BTC') {
           if (predictionText.includes('war') || predictionText.includes('conflict')) {
             targetPrice = (50000 + Math.random() * 50000).toFixed(0);
@@ -182,7 +188,7 @@
       simulationResults.classList.add('reveal');
     }
   </script>
-  <!-- Include your remaining modal HTML here if needed -->
 </body>
 </html>
+
 
