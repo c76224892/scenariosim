@@ -1,0 +1,277 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cryptocurrency Scenario Simulator</title>
+  <style>
+    /* Base Styling */
+    body {
+      background-color: black;
+      color: white;
+      font-family: 'Courier New', Courier, monospace;
+      padding: 20px;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    #terminal {
+      width: 80%;
+      max-width: 800px;
+      background: black;
+      padding: 20px;
+      border: 1px solid #333;
+      box-shadow: 0 0 10px rgba(153, 69, 255, 0.5);
+      margin-bottom: 20px;
+    }
+    .cursor {
+      display: inline-block;
+      width: 4px;
+      height: 16px;
+      background-color: #9945FF;
+      animation: blink 0.4s steps(2, start) infinite;
+    }
+    @keyframes blink {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    /* Main Button Styling */
+    #open-scenario-modal {
+      padding: 20px 40px;
+      font-size: 24px;
+      background: #9945FF;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 20px;
+      transition: background 0.3s;
+    }
+    #open-scenario-modal:hover {
+      background: #aa66ff;
+    }
+    /* Modal Styling */
+    #scenario-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    #scenario-modal > div {
+      background:#1a1a1a;
+      padding:20px;
+      width:90%;
+      max-width:600px;
+      border:2px solid #9945FF;
+      border-radius:10px;
+      position:relative;
+      max-height:90vh;
+      overflow-y:auto;
+    }
+    #close-scenario-modal {
+      position:absolute;
+      top:10px;
+      right:20px;
+      font-size:24px;
+      cursor:pointer;
+      color:#9945FF;
+    }
+    .form-group {
+      margin-bottom:15px;
+    }
+    .form-group label {
+      font-size:20px;
+      color:#9945FF;
+    }
+    .form-group textarea {
+      width:100%;
+      padding:10px;
+      background:#333;
+      color:white;
+      border:none;
+      border-radius:5px;
+      font-size:16px;
+    }
+    .form-group button {
+      padding:10px 20px;
+      background:#9945FF;
+      color:white;
+      border:none;
+      border-radius:5px;
+      cursor:pointer;
+      font-size:16px;
+      transition: background 0.3s;
+    }
+    .form-group button:hover {
+      background:#aa66ff;
+    }
+    #simulationResults {
+      margin-top:20px;
+      color:white;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+    /* Coin Buttons */
+    .coin-buttons {
+      display: flex;
+      justify-content: space-around;
+      margin-top:20px;
+    }
+    .coin-button {
+      padding: 10px 20px;
+      background: #9945FF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .coin-button:hover {
+      background: #aa66ff;
+    }
+    /* Explanation Section */
+    #explanation {
+      max-width: 800px;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #9945FF;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Explanation Section -->
+  <div id="explanation">
+    <h1>Cryptocurrency Scenario Simulator</h1>
+    <p>
+      This software runs scenarios for future coin prices of BTC, ETH, and SOL based on user predictions.
+      Users can enter predictions about the USA presidency, future wars, and global economic growth.
+      The simulator will then generate random potential upsides or downsides for each coin from its current price.
+    </p>
+  </div>
+
+  <!-- Terminal Section (Optional Info Display) -->
+  <div id="terminal"></div>
+
+  <!-- Main Simulation Button -->
+  <button id="open-scenario-modal">Run Scenario Simulation</button>
+
+  <!-- Scenario Simulation Modal -->
+  <div id="scenario-modal">
+    <div>
+      <span id="close-scenario-modal">&times;</span>
+      <h2 style="text-align:center; color:#9945FF;">Scenario Simulation</h2>
+      <form id="scenario-form">
+        <div class="form-group">
+          <label for="predictionText">Your Predictions:</label>
+          <textarea id="predictionText" rows="5" placeholder="Enter predictions for USA presidency 2028 & 2032, possible wars, global economy growth percentages..."></textarea>
+        </div>
+        <button type="submit">Run Simulation</button>
+      </form>
+      <div class="coin-buttons">
+        <button class="coin-button" data-coin="BTC">BTC Scenario</button>
+        <button class="coin-button" data-coin="ETH">ETH Scenario</button>
+        <button class="coin-button" data-coin="SOL">SOL Scenario</button>
+      </div>
+      <div id="simulationResults"></div>
+    </div>
+  </div>
+
+  <script>
+    // Simple terminal typing effect for introductory messages (optional)
+    const terminal = document.getElementById('terminal');
+    const introText = `
+Welcome to the Cryptocurrency Scenario Simulator.
+Enter your predictions about future events to see potential impacts on BTC, ETH, and SOL prices.
+    `;
+    let ti = 0;
+    const speed = 30;
+    function typeIntro() {
+      if (ti < introText.length) {
+        const char = introText[ti] === '\n' ? '<br>' : introText[ti];
+        terminal.innerHTML += char;
+        ti++;
+        setTimeout(typeIntro, speed);
+      } else {
+        terminal.innerHTML += '<span class="cursor"></span>';
+      }
+    }
+    typeIntro();
+
+    // Modal Logic
+    const openScenarioModal = document.getElementById('open-scenario-modal');
+    const closeScenarioModal = document.getElementById('close-scenario-modal');
+    const scenarioModal = document.getElementById('scenario-modal');
+    const scenarioForm = document.getElementById('scenario-form');
+    const simulationResults = document.getElementById('simulationResults');
+    let selectedCoin = null;
+
+    openScenarioModal.addEventListener('click', () => {
+      scenarioModal.style.display = 'flex';
+      simulationResults.style.opacity = '0'; // reset opacity for new results
+      simulationResults.innerHTML = '';
+    });
+
+    closeScenarioModal.addEventListener('click', () => {
+      scenarioModal.style.display = 'none';
+    });
+
+    // Coin Buttons to filter scenarios
+    const coinButtons = document.querySelectorAll('.coin-button');
+    coinButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        selectedCoin = button.getAttribute('data-coin');
+        runSimulation();
+      });
+    });
+
+    scenarioForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      // When form is submitted, clear previous coin selection
+      selectedCoin = null;
+      runSimulation();
+    });
+
+    function runSimulation() {
+      const predictionText = document.getElementById('predictionText').value.trim();
+
+      if (!predictionText && !selectedCoin) {
+        alert('Please enter your predictions or select a coin scenario.');
+        return;
+      }
+
+      // Define coins to simulate
+      const allCoins = ['BTC', 'ETH', 'SOL'];
+      const coinsToSimulate = selectedCoin ? [selectedCoin] : allCoins;
+
+      let resultsHTML = '<h3>Simulation Results:</h3><ul>';
+
+      coinsToSimulate.forEach(coin => {
+        // Random percentage change between -50% and +50%
+        const changePercent = (Math.random() * 100 - 50).toFixed(2);
+        const changeDirection = changePercent >= 0 ? '↑' : '↓';
+        resultsHTML += `<li>${coin}: ${changeDirection} ${Math.abs(changePercent)}%</li>`;
+      });
+
+      resultsHTML += '</ul>';
+      simulationResults.innerHTML = resultsHTML;
+      // Trigger animation
+      setTimeout(() => {
+        simulationResults.style.opacity = '1';
+      }, 100);
+    }
+  </script>
+</body>
+</html>
